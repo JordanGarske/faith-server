@@ -35,8 +35,10 @@ app.post("/api/send", (req, res) => {      const mailOptions = {
     text: 'Hello world?',
     html: '<b>Hello world?</b>'
   };      
+  console.log(req);
   transporter.sendMail(mailOptions, (error, info) => {
      if(error){
+
        return res.status(500).send(error);
      }
      res.status(200).send("Email sent successfully");
