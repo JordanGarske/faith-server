@@ -18,20 +18,20 @@ app.get(/(.*)/, (req, res) => {
 
 const transporter = nodemailer.createTransport({
     service: "gmail", 
-    host: 'smtp.gmail.com',
+    host: 'stmp.gmail.com',
     port:587,
     secure:false,
     auth: {
       user: "jordan.garske.j@gmail.com",
-      pass: GMAIL_PASS
+      pass: 'pywksiqppslysmvj'
     }
   });
 
 app.post("/api/send", (req, res) => {      const mailOptions = {
     from: 'jordan.garske.j@gmail.com',
     to: 'jordan.garske.j@gmail.com',
-    subject: 'Hello world?',
-    text: 'Hello world?',
+    subject: req.body.message,
+    text: req.body.message,
     html: '<b>Hello world?</b>'
   };      
   transporter.sendMail(mailOptions, (error, info) => {
