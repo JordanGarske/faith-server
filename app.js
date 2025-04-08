@@ -7,8 +7,6 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT ||8080;
 const GMAIL_PASS = process.env.GMAIL_PASS ;
-console.log(GMAIL_PASS)
-console.log(PORT)
 
 app.listen(PORT, () =>console.log("Server started"))
 
@@ -20,7 +18,7 @@ app.get(/(.*)/, (req, res) => {
 
 const transporter = nodemailer.createTransport({
     service: "gmail", 
-    host: 'stmp.gmail.com',
+    host: 'smtp.gmail.com',
     port:587,
     secure:false,
     auth: {
@@ -36,7 +34,6 @@ app.post("/api/send", (req, res) => {      const mailOptions = {
     text: 'Hello world?',
     html: '<b>Hello world?</b>'
   };      
-  console.log(req);
   transporter.sendMail(mailOptions, (error, info) => {
      if(error){
 
