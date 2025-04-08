@@ -7,7 +7,8 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT ||8080;
 const GMAIL_PASS = process.env.GMAIL_PASS ;
-
+console.log(GMAIL_PASS)
+console.log(PORT)
 
 app.listen(PORT, () =>console.log("Server started"))
 
