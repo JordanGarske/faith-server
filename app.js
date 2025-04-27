@@ -3,7 +3,7 @@ const nodemailer = require("nodemailer");
 const cors = require("cors");
 const path = require("path");
 const app = express();
-const { onValue, get, ref } = require("firebase/database");
+const { get, ref } = require("firebase/database");
 const { db } = require("./config/firebase.js");
 app.use(cors());
 app.use(express.json());
@@ -11,6 +11,7 @@ const PORT = process.env.PORT ||8080;
 const GMAIL_PASS = process.env.GMAIL_PASS ;
 
 app.listen(PORT, () =>console.log("Server started"))
+//get request
 app.get("/api/calendar", async (req, res) => {
   try {
       const userRef = ref(db, 'dates/');
@@ -32,6 +33,7 @@ app.get("/api/calendar", async (req, res) => {
       res.status(500).json({ error: "Failed to fetch calendar data" });
   }
 });
+// post request
 const transporter = nodemailer.createTransport({
   service: "gmail", 
   host: 'stmp.gmail.com',
@@ -59,7 +61,9 @@ transporter.sendMail(mailOptions, (error, info) => {
 });
 });    
 
+// sets all routes for react router frontend
 app.use(express.static(path.join(__dirname, "./build/client")))
+
 app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, "./build/client/index.html"));
 });
