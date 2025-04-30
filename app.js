@@ -1,37 +1,53 @@
-const express =require("express");
-const nodemailer = require("nodemailer");
-const cors = require("cors");
-const path = require("path");
-const app = express();
-const { get, ref } = require("firebase/database");
-const { db } = require("./config/firebase.js");
+import express from 'express';
+import nodemailer from 'nodemailer';
+import cors from 'cors';
+import path from 'path';
+
+import { fileURLToPath } from 'url';
+
+import {photos, getCalendarEvent} from './cronTask.js';
+export const app = express();
 app.use(cors());
 app.use(express.json());
+app.locals.photo = {};
+app.locals.calendarEvents = {};
+await photos();
+await getCalendarEvent();
 const PORT = process.env.PORT ||8080;
 const GMAIL_PASS = process.env.GMAIL_PASS ;
 
-app.listen(PORT, () =>console.log("Server started"))
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
 //get request
 app.get("/api/calendar", async (req, res) => {
-  try {
-      const userRef = ref(db, 'dates/');
-      const snapshot = await get(userRef);
-      
-      if (!snapshot.exists()) {
-          return res.json([]);
-      }
-
-      const data = snapshot.val();
-      const dates = Object.keys(data).map(key => ({
-          ...data[key],
-          id: key
-      }));
-
-      res.json(dates);
+  try{
+    res.json(req.app.locals.calendarEvents);
   } catch (error) {
       console.error("Error fetching calendar data:", error);
       res.status(500).json({ error: "Failed to fetch calendar data" });
-  }
+   }
+  // try {
+  //     const userRef = ref(db, 'dates/');
+  //     const snapshot = await get(userRef);
+      
+  //     if (!snapshot.exists()) {
+  //         return res.json([]);
+  //     }
+
+  //     const data = snapshot.val();
+  //     const dates = Object.keys(data).map(key => ({
+  //         ...data[key],
+  //         id: key,
+  //         image: key.image ?  req.app.locals.photo[data[key].image]: null 
+  //     }));
+  //     console.log(req.app.locals.photo)
+  //     res.json(dates);
+  // } catch (error) {
+  //     console.error("Error fetching calendar data:", error);
+  //     res.status(500).json({ error: "Failed to fetch calendar data" });
+  // }
 });
 // post request
 const transporter = nodemailer.createTransport({
@@ -68,6 +84,4 @@ app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, "./build/client/index.html"));
 });
 
-
-
-
+app.listen(PORT, () =>console.log("Server started"))
