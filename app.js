@@ -1,21 +1,26 @@
 import express from 'express';
-import nodemailer from 'nodemailer';
 import cors from 'cors';
 import path from 'path';
-
 import { fileURLToPath } from 'url';
-
-import {photos, getCalendarEvent} from './cronTask.js';
+import {photos, getCalendarEvent,newsLetterUrl} from './cronTask.js';
+import {transporter} from './config/mail.js'
+// init app 
 export const app = express();
 app.use(cors());
 app.use(express.json());
 app.locals.photo = {};
 app.locals.calendarEvents = {};
+app.locals.newsList = [];
+
+//get data
 await photos();
 await getCalendarEvent();
+await newsLetterUrl();
+//app env
 const PORT = process.env.PORT ||8080;
-const GMAIL_PASS = process.env.GMAIL_PASS ;
 
+
+// set import-from system
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -28,53 +33,35 @@ app.get("/api/calendar", async (req, res) => {
       console.error("Error fetching calendar data:", error);
       res.status(500).json({ error: "Failed to fetch calendar data" });
    }
-  // try {
-  //     const userRef = ref(db, 'dates/');
-  //     const snapshot = await get(userRef);
-      
-  //     if (!snapshot.exists()) {
-  //         return res.json([]);
-  //     }
 
-  //     const data = snapshot.val();
-  //     const dates = Object.keys(data).map(key => ({
-  //         ...data[key],
-  //         id: key,
-  //         image: key.image ?  req.app.locals.photo[data[key].image]: null 
-  //     }));
-  //     console.log(req.app.locals.photo)
-  //     res.json(dates);
-  // } catch (error) {
-  //     console.error("Error fetching calendar data:", error);
-  //     res.status(500).json({ error: "Failed to fetch calendar data" });
-  // }
+});
+app.get("/api/get/newsletter", async (req, res) => {
+  try{
+    res.json(req.app.locals.newsList);
+  } catch (error) {
+      console.error("Error fetching calendar data:", error);
+      res.status(500).json({ error: "Failed to fetch calendar data" });
+   }
+
 });
 // post request
-const transporter = nodemailer.createTransport({
-  service: "gmail", 
-  host: 'stmp.gmail.com',
-  port:587,
-  secure:false,
-  auth: {
-    user: "jordan.garske.j@gmail.com",
-    pass: GMAIL_PASS
-  }
-});
 
-app.post("/api/send", (req, res) => {      const mailOptions = {
+
+app.post("/api/send", (req, res) => {      
+  const mailOptions = {
   from: 'jordan.garske.j@gmail.com',
   to: 'jordan.garske.j@gmail.com',
   subject: req.body.message,
   text: req.body.message,
   html: '<b>Hello world?</b>'
-};      
-transporter.sendMail(mailOptions, (error, info) => {
-   if(error){
+  };      
+  transporter.sendMail(mailOptions, (error, info) => {
+    if(error){
 
-     return res.status(500).send(error);
-   }
-   res.status(200).send("Email sent successfully");
-});
+      return res.status(500).send(error);
+    }
+    res.status(200).send("Email sent successfully");
+  });
 });    
 
 // sets all routes for react router frontend
@@ -85,3 +72,8 @@ app.get(/(.*)/, (req, res) => {
 });
 
 app.listen(PORT, () =>console.log("Server started"))
+  
+
+
+
+
