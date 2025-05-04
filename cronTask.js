@@ -42,32 +42,73 @@ export async function photos() {
     console.error("Error listing files", err);
   }
 }
+// export async function newsLetterUrl() {
+//   try {
+//     const listResult = await listAll(storageRef(storage, 'newletter-images/'));
+//     const newsList = new Array(listResult.items.length);
+
+//     const items = await Promise.all(
+//       listResult.items.map(async (itemRef) => {
+//         const [url, metadata] = await Promise.all([
+//           getDownloadURL(itemRef),
+//           getMetadata(itemRef),
+//         ]);
+
+//         const pageIndex = metadata.customMetadata?.page;
+//         if (pageIndex !== undefined) {
+//           newsList[pageIndex-1] = url;
+//         }
+
+//         return { name: itemRef.name, url };
+//       })
+//     );
+
+//     app.locals.newsList = newsList;
+//   } catch (err) {
+//     console.error("Error listing newsletter images", err);
+//   }
+// }
 export async function newsLetterUrl() {
+  const months = getLastFiveMonths();
+
   try {
-    const listResult = await listAll(storageRef(storage, 'newletter-images/'));
-    const newsList = new Array(listResult.items.length);
+    await Promise.all(months.map(async (folder) => {
+      const listResult = await listAll(storageRef(storage, `newletter-images/${folder}`));
+      const newsList = new Array(listResult.items.length);
 
-    const items = await Promise.all(
-      listResult.items.map(async (itemRef) => {
-        const [url, metadata] = await Promise.all([
-          getDownloadURL(itemRef),
-          getMetadata(itemRef),
-        ]);
+      await Promise.all(
+        listResult.items.map(async (itemRef) => {
+          const [url, metadata] = await Promise.all([
+            getDownloadURL(itemRef),
+            getMetadata(itemRef),
+          ]);
 
-        const pageIndex = metadata.customMetadata?.page;
-        if (pageIndex !== undefined) {
-          newsList[pageIndex-1] = url;
-        }
-
-        return { name: itemRef.name, url };
-      })
-    );
-
-    app.locals.newsList = newsList;
+          const pageIndex = metadata.customMetadata?.page;
+          if (pageIndex !== undefined) {
+            newsList[pageIndex - 1] = url;
+          }
+        })
+      );
+      app.locals.newsList[folder] = newsList;
+    }));
   } catch (err) {
     console.error("Error listing newsletter images", err);
   }
 }
+
+function getLastFiveMonths() {
+  const months = [];
+  const currentDate = new Date();
+
+  for (let i = 0; i < 6; i++) {
+    const pastDate = new Date(currentDate);
+    pastDate.setMonth(currentDate.getMonth() - i);
+    months.push(pastDate.getMonth());
+  }
+
+  return months;
+}
+
 cron.schedule('*/15 * * * *', async () => {
   try {
     await photos();
@@ -83,7 +124,55 @@ cron.schedule('0 */24 * * *', async () => {
     console.error("Cron job error:", err);
   }
 });
+cron.schedule('*/59 * * * *', async () => {
+  try {
+    youtubeVideos();
+  } catch (err) {
+    console.error("Cron job error:", err);
+  }
+});
 
+export function youtubeVideos(){
+  const key = 'AIzaSyCYjUVh-dDvvvQQRAuGdlzG-uUvzrUBKJw'
+  const url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=20&playlistId=UUeFeHIXcJtbpw9AHLUFJ-xg&key=${key}`;
+
+  fetch(url).then(res => res.json()).then(data=>{
+    const videos = []
+    data.items.forEach(element => {
+      const detailUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=${element.snippet.resourceId.videoId}&key=${key}`;
+      fetch(detailUrl).then(res=>res.json()).then(info =>{
+        const minutes = parseYoutubeDuration(info.items[0].contentDetails.duration)
+
+        if(info.items[0].snippet.liveBroadcastContent !== 'none' || minutes > 20){
+          videos.push({id:element.snippet.resourceId.videoId, 
+                        url: element.snippet.thumbnails.maxres.url,
+                        title:element.snippet.title})
+        }
+      })
+    });
+    app.locals.youtube = videos
+  })
+}
+
+function parseYoutubeDuration(durationString) {
+  let duration = { hours: 0, minutes: 0, seconds: 0 };
+  const durationParts = durationString.replace("PT", "").replace("H", ":").replace("M", ":").replace("S", "").split(":");
+
+  if (durationParts.length === 3) {
+    duration.hours = parseInt(durationParts[0], 10);
+    duration.minutes = parseInt(durationParts[1], 10);
+    duration.seconds = parseInt(durationParts[2], 10);
+  } else if (durationParts.length === 2) {
+    duration.minutes = parseInt(durationParts[0], 10);
+    duration.seconds = parseInt(durationParts[1], 10);
+  } else if (durationParts.length === 1) {
+    duration.seconds = parseInt(durationParts[0], 10);
+  }
+
+  return duration.hours * 60 + duration.minutes
+}
+
+// Example usage:
 
 // cron.schedule('*/14 * * * *', () => {
 //   https.get('https://faith-server.onrender.com', (res) => {
