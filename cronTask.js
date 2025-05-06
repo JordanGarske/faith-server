@@ -133,7 +133,7 @@ cron.schedule('*/59 * * * *', async () => {
 });
 
 export function youtubeVideos(){
-  const key = 'AIzaSyCYjUVh-dDvvvQQRAuGdlzG-uUvzrUBKJw'
+  const key =process.env.YOUTUBE_API_KEY; 
   const url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=20&playlistId=UUeFeHIXcJtbpw9AHLUFJ-xg&key=${key}`;
 
   fetch(url).then(res => res.json()).then(data=>{
@@ -144,13 +144,15 @@ export function youtubeVideos(){
         const minutes = parseYoutubeDuration(info.items[0].contentDetails.duration)
 
         if(info.items[0].snippet.liveBroadcastContent !== 'none' || minutes > 20){
-          videos.push({id:element.snippet.resourceId.videoId, 
+          videos.push({ date: new Date(element.snippet.publishedAt), 
+                        id:element.snippet.resourceId.videoId, 
                         url: element.snippet.thumbnails.maxres.url,
                         title:element.snippet.title})
         }
       })
     });
-    app.locals.youtube = videos
+    console.log(videos.sort((a, b) => b.date - a.date));
+    app.locals.youtube = videos.sort((a, b) => b.date - a.date);
   })
 }
 
