@@ -132,29 +132,41 @@ cron.schedule('*/59 * * * *', async () => {
   }
 });
 
-export function youtubeVideos(){
-  const key =process.env.YOUTUBE_API_KEY; 
+export async function youtubeVideos() {
+  const key = process.env.YOUTUBE_API_KEY; 
   const url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=20&playlistId=UUeFeHIXcJtbpw9AHLUFJ-xg&key=${key}`;
 
-  fetch(url).then(res => res.json()).then(data=>{
-    const videos = []
-    data.items.forEach(element => {
-      const detailUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=${element.snippet.resourceId.videoId}&key=${key}`;
-      fetch(detailUrl).then(res=>res.json()).then(info =>{
-        const minutes = parseYoutubeDuration(info.items[0].contentDetails.duration)
+  const res = await fetch(url);
+  const data = await res.json();
 
-        if(info.items[0].snippet.liveBroadcastContent !== 'none' || minutes > 20){
-          videos.push({ date: new Date(element.snippet.publishedAt), 
-                        id:element.snippet.resourceId.videoId, 
-                        url: element.snippet.thumbnails.maxres.url,
-                        title:element.snippet.title})
-        }
-      })
-    });
-    console.log(videos.sort((a, b) => b.date - a.date));
-    app.locals.youtube = videos.sort((a, b) => b.date - a.date);
-  })
+  const promises = data.items.map(async (element) => {
+    const detailUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${element.snippet.resourceId.videoId}&key=${key}`;
+    const detailRes = await fetch(detailUrl);
+    const info = await detailRes.json();
+    const video = info.items[0];
+
+    const minutes = parseYoutubeDuration(video.contentDetails.duration);
+
+    if (video.snippet.liveBroadcastContent !== 'none' || minutes > 20) {
+      return {
+        date: new Date(element.snippet.publishedAt),
+        id: element.snippet.resourceId.videoId,
+        url: element.snippet.thumbnails.maxres.url,
+        title: element.snippet.title
+      };
+    }
+
+    return null;
+  });
+
+  const results = await Promise.all(promises);
+  const videos = results.filter(v => v !== null);
+
+  videos.sort((a, b) => b.date - a.date);
+  console.log(videos);
+  app.locals.youtube = videos;
 }
+
 
 function parseYoutubeDuration(durationString) {
   let duration = { hours: 0, minutes: 0, seconds: 0 };
