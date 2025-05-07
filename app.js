@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos} from './cronTask.js';
+import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos,newsLetterPdfUrl} from './cronTask.js';
 import {transporter} from './config/mail.js'
 // init app 
 export const app = express();
@@ -25,12 +25,14 @@ app.locals.calendarEvents = {
 
 };
 app.locals.newsList = [[],[],[],[],[],[],[],[],[],[],[],[]];
+app.locals.pdfList = ['','','','','','','','','','','',''];
 app.locals.youtube = [];
 
 //get data
 await photos();
 await getCalendarEvent();
 await newsLetterUrl();
+await newsLetterPdfUrl();
 youtubeVideos();
 //app env
 const PORT = process.env.PORT ||8080;
@@ -60,6 +62,15 @@ app.get("/api/get/newsletter", async (req, res) => {
    }
 
 });
+app.get("/api/get/pdf-newsletter", async (req, res) => {
+  try{
+    res.json(req.app.locals.pdfList);
+  } catch (error) {
+      console.error("Error fetching calendar data:", error);
+      res.status(500).json({ error: "Failed to fetch calendar data" });
+   }
+});
+
 app.get("/api/get/videos", async (req, res) => {
   try{
     res.json(req.app.locals.youtube);

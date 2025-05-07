@@ -42,32 +42,7 @@ export async function photos() {
     console.error("Error listing files", err);
   }
 }
-// export async function newsLetterUrl() {
-//   try {
-//     const listResult = await listAll(storageRef(storage, 'newletter-images/'));
-//     const newsList = new Array(listResult.items.length);
 
-//     const items = await Promise.all(
-//       listResult.items.map(async (itemRef) => {
-//         const [url, metadata] = await Promise.all([
-//           getDownloadURL(itemRef),
-//           getMetadata(itemRef),
-//         ]);
-
-//         const pageIndex = metadata.customMetadata?.page;
-//         if (pageIndex !== undefined) {
-//           newsList[pageIndex-1] = url;
-//         }
-
-//         return { name: itemRef.name, url };
-//       })
-//     );
-
-//     app.locals.newsList = newsList;
-//   } catch (err) {
-//     console.error("Error listing newsletter images", err);
-//   }
-// }
 export async function newsLetterUrl() {
   const months = getLastFiveMonths();
 
@@ -95,7 +70,31 @@ export async function newsLetterUrl() {
     console.error("Error listing newsletter images", err);
   }
 }
+export async function newsLetterPdfUrl() {
+  const months = getLastFiveMonths();
 
+  try {
+      const listResult = await listAll(storageRef(storage, `newsletters`));
+      const newsList = new Array(listResult.items.length);
+
+      await Promise.all(
+        listResult.items.map(async (itemRef) => {
+          const [url, metadata] = await Promise.all([
+            getDownloadURL(itemRef),
+            getMetadata(itemRef),
+          ]);
+          console.log(url, metadata.customMetadata?.uploadedAt);
+          const pageIndex = new Date((metadata.customMetadata?.uploadedAt));
+          if (pageIndex !== undefined) {
+            app.locals.pdfList[pageIndex.getMonth() - 1] = url;
+          }
+        })
+      );
+      console.log(   app.locals.pdfList)
+  } catch (err) {
+    console.error("Error listing newsletter images", err);
+  }
+}
 function getLastFiveMonths() {
   const months = [];
   const currentDate = new Date();
@@ -163,7 +162,6 @@ export async function youtubeVideos() {
   const videos = results.filter(v => v !== null);
 
   videos.sort((a, b) => b.date - a.date);
-  console.log(videos);
   app.locals.youtube = videos;
 }
 
