@@ -104,56 +104,6 @@ app.get('/api/check-session', (req, res) => {
   res.json({ loggedIn: !!sessionCookie });
 });
 
-// Update the proxy endpoint to properly handle authentication
-// app.post('/api/proxy', async (req, res) => {
-//   try {
-//     const { request } = req.body;
-
-//     // Validate request exists
-//     if (!request) {
-//       return res.status(400).json({ error: 'Request object is required' });
-//     }
-
-//     // Parse the request if it's a string (might be already parsed)
-//     const requestObj = typeof request === 'string' ? JSON.parse(request) : request;
-
-//     // Add session from cookie if available
-//     if (req.cookies.church_directory) {
-//       requestObj.Auth = requestObj.Auth || {};
-//       requestObj.Auth.Session = req.cookies.church_directory;
-//     }
-
-//     // Make the API call
-//     const response = await axios.post(ICON_CMO_API, {
-//       request: JSON.stringify(requestObj)
-//     }, {
-//       headers: {
-//         'Content-Type': 'application/json'
-//       }
-//     });
-
-//     // Set session cookie if we got a new session
-//     if (response.data && response.data.session) {
-//       res.cookie('church_directory', response.data.session, {
-//         httpOnly: true,
-//         secure: process.env.NODE_ENV === 'production',
-//         sameSite: 'strict',
-//         domain: process.env.COOKIE_DOMAIN || req.hostname
-//       });
-//     }
-//     console.log(response.data)
-
-//   } catch (error) {
-//     console.error('Proxy error:', error);
-//     if (error.response) {
-//       // Forward the API error response
-//       res.status(error.response.status).json(error.response.data);
-//     } else {
-//       res.status(500).json({ error: 'Proxy error' });
-//     }
-//   }
-// });
-
 
 
 
