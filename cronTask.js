@@ -83,14 +83,12 @@ export async function newsLetterPdfUrl() {
             getDownloadURL(itemRef),
             getMetadata(itemRef),
           ]);
-          console.log(url, metadata.customMetadata?.uploadedAt);
           const pageIndex = new Date((metadata.customMetadata?.uploadedAt));
           if (pageIndex !== undefined) {
             app.locals.pdfList[pageIndex.getMonth() - 1] = url;
           }
         })
       );
-      console.log(   app.locals.pdfList)
   } catch (err) {
     console.error("Error listing newsletter images", err);
   }
@@ -133,7 +131,7 @@ cron.schedule('*/59 * * * *', async () => {
 
 export async function youtubeVideos() {
   const key = process.env.YOUTUBE_API_KEY; 
-  const url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=20&playlistId=UUeFeHIXcJtbpw9AHLUFJ-xg&key=${key}`;
+  const url = `https://youtube.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=30&playlistId=UUeFeHIXcJtbpw9AHLUFJ-xg&key=${key}`;
 
   const res = await fetch(url);
   const data = await res.json();
@@ -186,14 +184,14 @@ function parseYoutubeDuration(durationString) {
 
 // Example usage:
 
-// cron.schedule('*/14 * * * *', () => {
-//   https.get('https://faith-server.onrender.com', (res) => {
-//     if (res.statusCode === 200) {
-//       console.log('Server pinged successfully');
-//     } else {
-//       console.log(`Server ping failed with status code: ${res.statusCode}`);
-//     }
-//   }).on('error', (err) => {
-//     console.error('Ping failed:', err);
-//   });
-// });
+cron.schedule('*/14 * * * *', () => {
+  https.get('https://faith-server.onrender.com', (res) => {
+    if (res.statusCode === 200) {
+      console.log('Server pinged successfully');
+    } else {
+      console.log(`Server ping failed with status code: ${res.statusCode}`);
+    }
+  }).on('error', (err) => {
+    console.error('Ping failed:', err);
+  });
+});
