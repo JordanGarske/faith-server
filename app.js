@@ -12,7 +12,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.locals.photo = {};
 app.locals.calendarEvents = {
   1:[], 2:[], 3:[], 4:[], 5:[], 6:[],
@@ -171,7 +171,10 @@ app.post('/api/proxy', async (req, res) => {
     // Send the request
     file['directory'] = items
     file['statistics']['records'] = items.length
-    res.json(file)
+    for ( var property in file ) {
+      console.log( property ); // Outputs: foo, fiz or fiz, foo
+    }
+    res.json({statistics: file.statistics, directory: file.directory})
 
   } catch (error) {
     console.error('Proxy error:', error);
