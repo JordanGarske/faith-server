@@ -4,7 +4,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos,newsLetterPdfUrl} from './cronTask.js';
 import {transporter} from './config/mail.js';
-import axios from 'axios';
 import cookieParser from 'cookie-parser';
 // init app 
 export const app = express();
@@ -95,12 +94,41 @@ app.post("/api/send", (req, res) => {
   });
 });    
 
+app.post('/login', async (req, res) => {
+  console.log(req.cookies)
+    if (req.cookies.church_directory){
+      res.status(200).send('login')
+    }
+    else{
+      const { request } = req.body;
+      const requestObj = typeof request === 'string' ? JSON.parse(request) : request;
+      const query = requestObj;
+      const account = await  fetch("https://secure3.iconcmo.com/api/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(query)
+      })
+      const file = await account.json();
+      if(file.number === 300){
+        res.status(401).send('failed login')
+        return
+      }
+      res.cookie('church_directory', file.session, {
+        maxAge: 4 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,              // can't be accessed by JS in the browser
+        secure: true,               // true if using HTTPS
+        sameSite: 'lax'
+      });
+        }
 
-const ICON_CMO_API = "https://secure3.iconcmo.com/api/";
+});
 
 // Add this endpoint to check session
 app.get('/api/check-session', (req, res) => {
   const sessionCookie = req.cookies.church_directory;
+  console.log('cookie', sessionCookie)
   res.json({ loggedIn: !!sessionCookie });
 });
 
@@ -112,7 +140,9 @@ app.post('/api/proxy', async (req, res) => {
     const { request } = req.body;
     const requestObj = typeof request === 'string' ? JSON.parse(request) : request;
     const query = requestObj;
-    console.log(requestObj)
+    if (req.cookies.church_directory){
+      query.Auth = {"Session": req.cookies.church_directory}
+    }
     const x = await  fetch("https://secure3.iconcmo.com/api/", {
       method: "POST",
       headers: {
@@ -121,16 +151,23 @@ app.post('/api/proxy', async (req, res) => {
       body: JSON.stringify(query)
     })
     const file = await x.json();
-
+    if(file.session){
+      res.cookie('church_directory', file.session, {
+        maxAge: 4 * 60 * 60 * 1000, // 1 day
+        httpOnly: true,              // can't be accessed by JS in the browser
+        secure: true,               // true if using HTTPS
+        sameSite: 'lax'
+      });
+    }
     const a = new Set();
     const items = []
+    console.log(file)
     file['directory'].forEach(element => {
       if (element['status']==='ActMem'){
         items.push(element)
       }
       a.add(element['status'])
     });   
-    console.log(items.length)
     // Send the request
     file['directory'] = items
     file['statistics']['records'] = items.length
