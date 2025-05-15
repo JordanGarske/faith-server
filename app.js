@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos,newsLetterPdfUrl} from './cronTask.js';
+import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos,newsLetterPdfUrl, getImgsObject} from './cronTask.js';
 import {transporter} from './config/mail.js';
 import cookieParser from 'cookie-parser';
 // init app 
@@ -21,12 +21,16 @@ app.locals.calendarEvents = {
 app.locals.newsList = [[],[],[],[],[],[],[],[],[],[],[],[]];
 app.locals.pdfList = ['','','','','','','','','','','',''];
 app.locals.youtube = [];
+app.locals.carousel = [];
+app.locals.aboutUs = [];
 
 //get data
 await photos();
-await getCalendarEvent();
+// await getCalendarEvent();
 await newsLetterUrl();
 await newsLetterPdfUrl();
+app.locals.carousel = await getImgsObject('carousel/');
+app.locals.aboutUs = await getImgsObject('about-us/');
 youtubeVideos();
 //app env
 const PORT = process.env.PORT ||8080;
@@ -41,6 +45,24 @@ const __dirname = path.dirname(__filename);
 app.get("/api/calendar", async (req, res) => {
   try{
     res.json(req.app.locals.calendarEvents);
+  } catch (error) {
+      console.error("Error fetching calendar data:", error);
+      res.status(500).json({ error: "Failed to fetch calendar data" });
+   }
+
+});
+app.get("/api/carousel", async (req, res) => {
+  try{
+    res.json(req.app.locals.carousel);
+  } catch (error) {
+      console.error("Error fetching calendar data:", error);
+      res.status(500).json({ error: "Failed to fetch calendar data" });
+   }
+
+});
+app.get("/api/about-us", async (req, res) => {
+  try{
+    res.json(req.app.locals.aboutUs);
   } catch (error) {
       console.error("Error fetching calendar data:", error);
       res.status(500).json({ error: "Failed to fetch calendar data" });
@@ -161,7 +183,6 @@ app.post('/api/proxy', async (req, res) => {
     }
     const a = new Set();
     const items = []
-    console.log(file)
     file['directory'].forEach(element => {
       if (element['status']==='ActMem'){
         items.push(element)
@@ -171,9 +192,6 @@ app.post('/api/proxy', async (req, res) => {
     // Send the request
     file['directory'] = items
     file['statistics']['records'] = items.length
-    for ( var property in file ) {
-      console.log( property ); // Outputs: foo, fiz or fiz, foo
-    }
     res.json({statistics: file.statistics, directory: file.directory})
 
   } catch (error) {
