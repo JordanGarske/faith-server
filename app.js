@@ -101,7 +101,7 @@ app.get("/api/get/videos", async (req, res) => {
 app.post("/api/send", (req, res) => {      
   const mailOptions = {
     from: req.body.email,
-    to: 'jordan.garske.j@gmail.com',
+    to: process.env.CHURCH_EMAIL,
     subject: req.body.subject,
     text: req.body.message,
     html: `<b>${req.body.name}: ${req.body.message}</b>`
