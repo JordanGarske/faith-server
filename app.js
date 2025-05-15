@@ -148,7 +148,6 @@ app.post('/login', async (req, res) => {
 // Add this endpoint to check session
 app.get('/api/check-session', (req, res) => {
   const sessionCookie = req.cookies.church_directory;
-  console.log('cookie', sessionCookie)
   res.json({ loggedIn: !!sessionCookie });
 });
 
@@ -173,7 +172,7 @@ app.post('/api/proxy', async (req, res) => {
     const file = await x.json();
     if(file.session){
       res.cookie('church_directory', file.session, {
-        maxAge: 4 * 60 * 60 * 1000, // 1 day
+        maxAge: 4 * 60 * 60 * 1000, // 4 hours
         httpOnly: true,              // can't be accessed by JS in the browser
         secure: true,               // true if using HTTPS
         sameSite: 'lax'
@@ -201,10 +200,6 @@ app.post('/api/proxy', async (req, res) => {
     }
   }
 });
-
-
-
-
 
 // sets all routes for react router frontend
 app.use(express.static(path.join(__dirname, "./build/client")))
