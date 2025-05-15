@@ -98,23 +98,21 @@ app.get("/api/get/videos", async (req, res) => {
 });
 // post request
 
-
 app.post("/api/send", (req, res) => {      
   const mailOptions = {
-  from: 'jordan.garske.j@gmail.com',
-  to: 'jordan.garske.j@gmail.com',
-  subject: req.body.message,
-  text: req.body.message,
-  html: '<b>Hello world?</b>'
+    from: req.body.email,
+    to: 'jordan.garske.j@gmail.com',
+    subject: req.body.subject,
+    text: req.body.message,
+    html: `<b>${req.body.name}: ${req.body.message}</b>`
   };      
   transporter.sendMail(mailOptions, (error, info) => {
-    if(error){
-
-      return res.status(500).send(error);
+    if(error) {
+      return res.status(500).json({ error: error.message });
     }
-    res.status(200).send("Email sent successfully");
+    res.status(200).json({ success: "Email sent successfully" });
   });
-});    
+});  
 
 app.post('/login', async (req, res) => {
   console.log(req.cookies)

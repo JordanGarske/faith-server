@@ -33,8 +33,9 @@ export async function getImgsObject(folder){
         if (snapshot.exists()) {
           const data = snapshot.val();
           const images = data.map((data) => {
+            console.log(data.photo.src)
             if(app.locals.photo[data.photo.src]  === null){
-              console.log(data.photo.src)
+
               console.log(app.locals.photo)
             }
             data.photo.src = data ? app.locals.photo[data.photo.src] : null
