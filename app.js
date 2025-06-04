@@ -29,6 +29,7 @@ await photos();
 // await getCalendarEvent();
 await newsLetterUrl();
 await newsLetterPdfUrl();
+await getCalendarEvent();
 app.locals.carousel = await getImgsObject('carousel/');
 app.locals.aboutUs = await getImgsObject('about-us/');
 youtubeVideos();
@@ -44,6 +45,7 @@ const __dirname = path.dirname(__filename);
 //get request
 app.get("/api/calendar", async (req, res) => {
   try{
+    console.log(req.app.locals.calendarEvents)
     res.json(req.app.locals.calendarEvents);
   } catch (error) {
       console.error("Error fetching calendar data:", error);
@@ -121,8 +123,10 @@ app.post('/login', async (req, res) => {
     }
     else{
       const { request } = req.body;
+      console.log(req.body)
       const requestObj = typeof request === 'string' ? JSON.parse(request) : request;
       const query = requestObj;
+      console.log(query)
       const account = await  fetch("https://secure3.iconcmo.com/api/", {
         method: "POST",
         headers: {
@@ -130,6 +134,7 @@ app.post('/login', async (req, res) => {
         },
         body: JSON.stringify(query)
       })
+      console.log(account);
       const file = await account.json();
       if(file.number === 300){
         res.status(401).send('failed login')
@@ -155,11 +160,13 @@ app.get('/api/check-session', (req, res) => {
 
 
 app.post('/api/proxy', async (req, res) => {
+  console.log('here')
   try {
     const { request } = req.body;
     const requestObj = typeof request === 'string' ? JSON.parse(request) : request;
     const query = requestObj;
     if (req.cookies.church_directory){
+      console.log(req.cookies.church_directory)
       query.Auth = {"Session": req.cookies.church_directory}
     }
     const x = await  fetch("https://secure3.iconcmo.com/api/", {
@@ -187,9 +194,10 @@ app.post('/api/proxy', async (req, res) => {
       a.add(element['status'])
     });   
     // Send the request
+    console.log(file['directory']);
     file['directory'] = items
     file['statistics']['records'] = items.length
-    res.json({statistics: file.statistics, directory: file.directory})
+    res.json({statistics: file.statistics, directory: file.directory,   session: file.session,                                                                                                                                                    })
 
   } catch (error) {
     console.error('Proxy error:', error);
@@ -203,7 +211,7 @@ app.post('/api/proxy', async (req, res) => {
 
 // sets all routes for react router frontend
 app.use(express.static(path.join(__dirname, "./build/client")))
-
+                                                                                                                                             
 app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, "./build/client/index.html"));
 });
