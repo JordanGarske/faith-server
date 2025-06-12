@@ -146,7 +146,7 @@ cron.schedule('0 */24 * * *', async () => {
     console.error("Cron job error:", err);
   }
 });
-cron.schedule('*/59 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
   try {
     youtubeVideos();
   } catch (err) {
