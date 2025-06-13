@@ -165,6 +165,9 @@ export async function youtubeVideos() {
     const detailUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${element.snippet.resourceId.videoId}&key=${key}`;
     const detailRes = await fetch(detailUrl);
     const info = await detailRes.json();
+    if (info.items === null){
+      return null
+    }
     const video = info.items[0];
 
     const minutes = parseYoutubeDuration(video.contentDetails.duration);
@@ -185,7 +188,9 @@ export async function youtubeVideos() {
   const videos = results.filter(v => v !== null);
 
   videos.sort((a, b) => b.date - a.date);
-  app.locals.youtube = videos;
+  if(videos.length > 0){
+    app.locals.youtube = videos;
+  }
 }
 
 
