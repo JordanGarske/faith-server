@@ -163,13 +163,18 @@ export async function youtubeVideos() {
 
   const promises = data.items.map(async (element) => {
     const detailUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${element.snippet.resourceId.videoId}&key=${key}`;
-    const detailRes = await fetch(detailUrl);
-    const info = await detailRes.json();
-    if (info.items === null){
+    var video = null
+    var count = 0
+    while(video === null && count < 10){
+      const detailRes = await fetch(detailUrl);
+      const info = await detailRes.json();
+      if (info.items !== null && info.items[0] !== null ){
+        video = info.items[0];
+      }
+    }
+    if(video === null && video === 10){
       return null
     }
-    const video = info.items[0];
-
     const minutes = parseYoutubeDuration(video.contentDetails.duration);
 
     if (video.snippet.liveBroadcastContent !== 'none' || minutes > 20) {
