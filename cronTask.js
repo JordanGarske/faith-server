@@ -171,8 +171,9 @@ export async function youtubeVideos() {
       if (info.items !== null && info.items[0] !== null ){
         video = info.items[0];
       }
+      count += 1
     }
-    if(video === null && video === 10){
+    if(video === null && count === 10){
       return null
     }
     const minutes = parseYoutubeDuration(video.contentDetails.duration);
