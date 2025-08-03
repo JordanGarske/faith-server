@@ -36,7 +36,7 @@ export async function getImgsObject(folder){
             console.log(data.photo.src)
             if(app.locals.photo[data.photo.src]  === null){
 
-              console.log(app.locals.photo)
+              console.log(app.locals.photo, folder)
             }
             data.photo.src = data ? app.locals.photo[data.photo.src] : null
             return data;
@@ -135,6 +135,7 @@ cron.schedule('*/15 * * * *', async () => {
     await photos();
     // await getCalendarEvent();
     app.locals.carousel = await getImgsObject('carousel/');
+    
   } catch (err) {
     console.error("Cron job error:", err);
   }

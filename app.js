@@ -23,7 +23,6 @@ app.locals.pdfList = ['','','','','','','','','','','',''];
 app.locals.youtube = [];
 app.locals.carousel = [];
 app.locals.aboutUs = [];
-
 //get data
 await photos();
 // await getCalendarEvent();
@@ -32,6 +31,7 @@ await newsLetterPdfUrl();
 await getCalendarEvent();
 app.locals.carousel = await getImgsObject('carousel/');
 app.locals.aboutUs = await getImgsObject('about-us/');
+app.locals.staff = await getImgsObject('staff/');
 youtubeVideos();
 //app env
 const PORT = process.env.PORT ||8080;
@@ -92,6 +92,15 @@ app.get("/api/get/pdf-newsletter", async (req, res) => {
 app.get("/api/get/videos", async (req, res) => {
   try{
     res.json(req.app.locals.youtube);
+  } catch (error) {
+      console.error("Error fetching calendar data:", error);
+      res.status(500).json({ error: "Failed to fetch calendar data" });
+   }
+
+});
+app.get("/api/get/staff", async (req, res) => {
+  try{
+    res.json(req.app.locals.staff);
   } catch (error) {
       console.error("Error fetching calendar data:", error);
       res.status(500).json({ error: "Failed to fetch calendar data" });
