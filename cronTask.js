@@ -161,7 +161,7 @@ export async function youtubeVideos() {
 
   const res = await fetch(url);
   const data = await res.json();
-
+  try{
   const promises = data.items.map(async (element) => {
     const detailUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${element.snippet.resourceId.videoId}&key=${key}`;
     var video = null
@@ -169,7 +169,7 @@ export async function youtubeVideos() {
     while(video === null && count < 10){
       const detailRes = await fetch(detailUrl);
       const info = await detailRes.json();
-      if (info.items !== null && info.items[0] !== null ){
+      if (info.items !== null && info.items !== undefined &&info.items[0] !== null ){
         video = info.items[0];
       }
       count += 1
@@ -197,6 +197,10 @@ export async function youtubeVideos() {
   videos.sort((a, b) => b.date - a.date);
   if(videos.length > 0){
     app.locals.youtube = videos;
+  }
+  }
+  catch{
+    
   }
 }
 
