@@ -1,1 +1,0 @@
-async function t(o,r){try{await Promise.all(o.map(e=>e())),r(!1)}catch(e){console.error("Error in serverRequest:",e)}}async function a(o,r){try{const s=await(await fetch(o,{method:"GET",headers:{"Content-Type":"application/json"}})).json();console.log(s),r(s)}catch(e){console.error("Error fetching calendar data:",e)}}export{t as a,a as s};
