@@ -107,9 +107,9 @@ export async function newsLetterPdfUrl() {
             getDownloadURL(itemRef),
             getMetadata(itemRef),
           ]);
-          const pageIndex = new Date((metadata.customMetadata?.month));
+          const pageIndex = parseInt(metadata.customMetadata?.month);
           if (pageIndex !== undefined) {
-            app.locals.pdfList[pageIndex] = url;
+            app.locals.pdfList[pageIndex - 1] = url;
           }
         })
       );
