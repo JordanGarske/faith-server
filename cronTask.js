@@ -25,6 +25,21 @@ export async function getCalendarEvent(){
         console.error("Error fetching calendar data:", error);
     }
 }
+export async function getImgsEntityfolder(folder){
+    try {
+        const userRef = dbRef(db, folder);
+        const snapshot = await get(userRef);
+        
+        if (snapshot.exists()) {
+          return snapshot.val()
+          
+        }
+
+    } catch (error) {
+        console.error("Error fetching calendar data:", error);
+        return{}
+    }
+}
 export async function getImgsObject(folder){
     try {
         const userRef = dbRef(db, folder);
@@ -133,6 +148,7 @@ function getLastFiveMonths() {
 cron.schedule('*/15 * * * *', async () => {
   try {
     await photos();
+    app.locals.pages = await getImgsEntityfolder('pages/about') 
     // await getCalendarEvent();
     app.locals.carousel = await getImgsObject('carousel/');
     

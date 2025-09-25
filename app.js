@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos,newsLetterPdfUrl, getImgsObject} from './cronTask.js';
+import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos,newsLetterPdfUrl, getImgsObject,getImgsEntityfolder} from './cronTask.js';
 import {transporter} from './config/mail.js';
 import cookieParser from 'cookie-parser';
 // init app 
@@ -32,6 +32,7 @@ await getCalendarEvent();
 app.locals.carousel = await getImgsObject('carousel/');
 app.locals.aboutUs = await getImgsObject('about-us/');
 app.locals.staff = await getImgsObject('staff/');
+app.locals.pages = await getImgsEntityfolder('pages/about');
 youtubeVideos();
 //app env
 const PORT = process.env.PORT ||8080;
@@ -101,6 +102,16 @@ app.get("/api/get/videos", async (req, res) => {
 app.get("/api/get/staff", async (req, res) => {
   try{
     res.json(req.app.locals.staff);
+  } catch (error) {
+      console.error("Error fetching calendar data:", error);
+      res.status(500).json({ error: "Failed to fetch calendar data" });
+   }
+
+});
+app.get("/api/get/page", async (req, res) => {
+  try{
+    console.log(req.query.pages)
+    res.json(req.app.locals.pages);
   } catch (error) {
       console.error("Error fetching calendar data:", error);
       res.status(500).json({ error: "Failed to fetch calendar data" });
