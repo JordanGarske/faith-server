@@ -148,7 +148,8 @@ function getLastFiveMonths() {
 cron.schedule('*/15 * * * *', async () => {
   try {
     await photos();
-    app.locals.pages = await getImgsEntityfolder('pages/about') 
+    app.locals.pages = await getImgsEntityfolder('pages')
+    console.log(app.locals.pages) 
     // await getCalendarEvent();
     app.locals.carousel = await getImgsObject('carousel/');
     
