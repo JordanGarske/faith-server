@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import fileURLToPath  from 'url';
+import {fileURLToPath}  from 'url';
 import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos,newsLetterPdfUrl, getImgsObject,getImgsEntityfolder} from './cronTask.js';
 import {transporter} from './config/mail.js';
 import cookieParser from 'cookie-parser';
