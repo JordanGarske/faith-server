@@ -197,6 +197,7 @@ export async function youtubeVideos() {
     const minutes = parseYoutubeDuration(video.contentDetails.duration);
 
     if (video.snippet.liveBroadcastContent !== 'none' || minutes > 20) {
+      
       return {
         date: new Date(element.snippet.publishedAt),
         id: element.snippet.resourceId.videoId,
@@ -217,7 +218,7 @@ export async function youtubeVideos() {
   }
   }
   catch{
-    
+    console.log('getting youtube video fail')
   }
 }
 

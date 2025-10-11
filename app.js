@@ -33,8 +33,7 @@ app.locals.carousel = await getImgsObject('carousel/');
 app.locals.aboutUs = await getImgsObject('about-us/');
 app.locals.staff = await getImgsObject('staff/');
 app.locals.pages = await getImgsEntityfolder('pages');
-console.log(app.locals.pages)
-youtubeVideos();
+await youtubeVideos();
 //app env
 const PORT = process.env.PORT ||8080;
 
@@ -111,7 +110,6 @@ app.get("/api/get/staff", async (req, res) => {
 });
 app.get("/api/get/page", async (req, res) => {
   try{
-    console.log(req.body)
     res.json(req.app.locals.pages[req.query.name]);
   } catch (error) {
       console.error("Error fetching calendar data:", error);
@@ -181,7 +179,6 @@ app.get('/api/check-session', (req, res) => {
 
 
 app.post('/api/proxy', async (req, res) => {
-  console.log('here')
   try {
     const { request } = req.body;
     const requestObj = typeof request === 'string' ? JSON.parse(request) : request;
