@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import fileURLToPath  from 'url';
 import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos,newsLetterPdfUrl, getImgsObject,getImgsEntityfolder} from './cronTask.js';
 import {transporter} from './config/mail.js';
 import cookieParser from 'cookie-parser';
@@ -125,7 +125,7 @@ app.post("/api/send", (req, res) => {
   const mailOptions = {
     from: req.body.email,
     to: process.env.CHURCH_EMAIL,
-    subject: req.body.subject,
+    subject: `${req.body.email}: (${req.body.subject})`,
     text: req.body.message,
     html: `<b>${req.body.name}: ${req.body.message}</b>`
   };      
