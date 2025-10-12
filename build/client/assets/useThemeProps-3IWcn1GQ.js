@@ -1,0 +1,1 @@
+import{d as m}from"./createSimplePaletteValueFilter-UGedLJK_.js";import{g as a}from"./getThemeProps-BBjFt6Nq.js";import{t as p}from"./Box-C0Y89kWi.js";const n=m();function c({props:r,name:s,defaultTheme:o,themeId:t}){let e=p(o);return t&&(e=e[t]||e),a({theme:e,name:s,props:r})}export{n as s,c as u};
