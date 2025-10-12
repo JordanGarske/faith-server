@@ -164,7 +164,7 @@ cron.schedule('0 */24 * * *', async () => {
     console.error("Cron job error:", err);
   }
 });
-cron.schedule('*/5 * * * *', async () => {
+cron.schedule('*/10 * * * *', async () => {
   try {
     youtubeVideos();
   } catch (err) {
@@ -217,8 +217,8 @@ export async function youtubeVideos() {
     app.locals.youtube = videos;
   }
   }
-  catch{
-    console.log('getting youtube video fail')
+  catch (error){
+    console.log(`getting youtube video fail ${error}`)
   }
 }
 
