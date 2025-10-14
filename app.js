@@ -168,6 +168,14 @@ app.post('/login', async (req, res) => {
         }
 
 });
+// --- CHECK SESSION ROUTE ---
+app.get("/api/check-session", (req, res) => {
+  if (req.cookies.login && req.cookies.login.key === true) {
+    res.json({ loggedIn: true });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
 
 // Add this endpoint to check session
 app.get('/api/check-session', (req, res) => {
