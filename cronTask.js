@@ -145,32 +145,32 @@ function getLastFiveMonths() {
   return months;
 }
 
-cron.schedule('*/15 * * * *', async () => {
-  try {
-    await photos();
-    app.locals.pages = await getImgsEntityfolder('pages')
-    console.log(app.locals.pages) 
-    // await getCalendarEvent();
-    app.locals.carousel = await getImgsObject('carousel/');
+// cron.schedule('*/15 * * * *', async () => {
+//   try {
+//     await photos();
+//     app.locals.pages = await getImgsEntityfolder('pages')
+//     console.log(app.locals.pages) 
+//     // await getCalendarEvent();
+//     app.locals.carousel = await getImgsObject('carousel/');
     
-  } catch (err) {
-    console.error("Cron job error:", err);
-  }
-});
-cron.schedule('0 */24 * * *', async () => {
-  try {
-    await newsLetterUrl();
-  } catch (err) {
-    console.error("Cron job error:", err);
-  }
-});
-cron.schedule('*/10 * * * *', async () => {
-  try {
-    youtubeVideos();
-  } catch (err) {
-    console.error("Cron job error:", err);
-  }
-});
+//   } catch (err) {
+//     console.error("Cron job error:", err);
+//   }
+// });
+// cron.schedule('0 */24 * * *', async () => {
+//   try {
+//     await newsLetterUrl();
+//   } catch (err) {
+//     console.error("Cron job error:", err);
+//   }
+// });
+// cron.schedule('*/10 * * * *', async () => {
+//   try {
+//     youtubeVideos();
+//   } catch (err) {
+//     console.error("Cron job error:", err);
+//   }
+// });
 
 export async function youtubeVideos() {
   const key = process.env.YOUTUBE_API_KEY; 
@@ -243,14 +243,14 @@ function parseYoutubeDuration(durationString) {
 
 // Example usage:
 
-cron.schedule('*/14 * * * *', () => {
-  https.get('https://faith-server.onrender.com', (res) => {
-    if (res.statusCode === 200) {
-      console.log('Server pinged successfully');
-    } else {
-      console.log(`Server ping failed with status code: ${res.statusCode}`);
-    }
-  }).on('error', (err) => {
-    console.error('Ping failed:', err);
-  });
-});
+// cron.schedule('*/14 * * * *', () => {
+//   https.get('https://faith-server.onrender.com', (res) => {
+//     if (res.statusCode === 200) {
+//       console.log('Server pinged successfully');
+//     } else {
+//       console.log(`Server ping failed with status code: ${res.statusCode}`);
+//     }
+//   }).on('error', (err) => {
+//     console.error('Ping failed:', err);
+//   });
+// });
