@@ -35,7 +35,7 @@ app.locals.staff = await getImgsObject('staff/');
 app.locals.pages = await getImgsEntityfolder('pages');
 await youtubeVideos();
 //app env
-const PORT = process.env.PORT ||8080;
+const PORT = process.env.PORT || 4000;
 
 
 // set import-from system
