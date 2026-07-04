@@ -24,16 +24,16 @@ app.locals.youtube = [];
 app.locals.carousel = [];
 app.locals.aboutUs = [];
 //get data
-await photos();
+// await photos();
 // await getCalendarEvent();
-await newsLetterUrl();
-await newsLetterPdfUrl();
-await getCalendarEvent();
+// await newsLetterUrl();
+// await newsLetterPdfUrl();
+// await getCalendarEvent();
 app.locals.carousel = await getImgsObject('carousel/');
 app.locals.aboutUs = await getImgsObject('about-us/');
 app.locals.staff = await getImgsObject('staff/');
 app.locals.pages = await getImgsEntityfolder('pages');
-await youtubeVideos();
+// await youtubeVideos();
 //app env
 const PORT = process.env.PORT || 4000;
 
