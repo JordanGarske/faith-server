@@ -59,7 +59,6 @@ app.post(
 );
 app.get(
   "/admin/get/:folder",
-  checkLogin,
   getFolderData
 );
 //get request
