@@ -5,6 +5,7 @@ import {fileURLToPath}  from 'url';
 import {photos, getCalendarEvent, newsLetterUrl, youtubeVideos,newsLetterPdfUrl, getImgsObject,getImgsEntityfolder} from './cronTask.js';
 import {transporter} from './config/mail.js';
 import cookieParser from 'cookie-parser';
+import {getFolderData, checkLogin, login, addToFireBase, deleteFromFireBase } from "./admin.js";
 // init app 
 export const app = express();
 app.use(cors({
@@ -42,7 +43,25 @@ const PORT = process.env.PORT || 4000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
+app.post(
+  "/login",
+  login
+);
+app.post(
+  "/admin/data/",
+  addToFireBase,
+  login
+);
+app.post(
+  "/admin/delete/",
+  deleteFromFireBase,
+  login
+);
+app.get(
+  "/admin/get/:folder",
+  checkLogin,
+  getFolderData
+);
 //get request
 app.get("/api/calendar", async (req, res) => {
   try{
@@ -201,7 +220,7 @@ app.post('/api/proxy', async (req, res) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(query)
-    })
+    })        
     const file = await x.json();
     if(file.session){
       res.cookie('church_directory', file.session, {
